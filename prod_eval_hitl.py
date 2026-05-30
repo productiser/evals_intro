@@ -75,6 +75,11 @@ def calculate_evaluation_metrics(tickets):
     # Safe division helpers to prevent ZeroDivisionError
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    f1_score = (
+        (2 * precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0.0
+    )
 
     return {
         "precision": round(precision, 3),
@@ -85,6 +90,7 @@ def calculate_evaluation_metrics(tickets):
             "true_negatives": tn,
             "false_negatives": fn,
         },
+        "f1_score": round(f1_score, 3),
     }
 
 
@@ -169,7 +175,6 @@ if __name__ == "__main__":
 
         # Print quick recap to console
         print(f"   - Accuracy:  {final_metrics['accuracy']}")
-        print(f"   - Precision: {final_metrics['precision']}")
         print(f"   - Recall:    {final_metrics['recall']}")
         print(f"   - F1-Score:  {final_metrics['f1_score']}")
 

@@ -1,6 +1,6 @@
-My day started with a question. "How can I get consistent results from AI" Didnt know I'll learn about evals.
+My day started with a question. "How can I get **consistent** results from AI". Didnt know I'll learn about evals.
 
-Why should you care?
+## Why should you care?
 
 Everyone is working on AI or AI agents these days. AI systems arent a direct function- there are lot of parameters- the model, the weights, the prompt quality, inputs etc. which honestly makes reliability questionable.
 
@@ -78,11 +78,15 @@ As precision goes lower, we end up with results we dont need. Which again adds t
 
 ## Accuracy
 
-I dont care for accuracy much because it takse both sides. FP and FN. The issue with taking both sides is that in large volumes, a small error goes un-noticed. I didnt test this so giving it a miss.
+Accuracy takes both sides. FP and FN. The issue with taking both sides is that in large volumes, a small error goes un-noticed. Not exploring further in this essay.
 
 ## F1
 
 F1 is interesting because it tries to penalise imbalanced recall and precision. F1 is also great because we have several parameters- model, prompt and F1 gives one number to make sense of it all before deciding.
+$$
+2 * (FP*FR)/(FP+FR)
+$$
+
 
 | Recall         | Precision     | F1   |
 | -------------- | ------------- | ---- |
@@ -91,15 +95,23 @@ F1 is interesting because it tries to penalise imbalanced recall and precision. 
 | 0 (all misses) | 100           | 0    |
 | 75             | 90            | 82   |
 
+### **Threshold sensitivity**
+
+ LLMs produce probabilistic outputs. In production evals, you'd vary the decision threshold and plot a precision-recall curve. 
+
+Decided this is going to be step 2 and depending on specific context so not exploring it here today.
+
 ## Consistency
 
 But what about getting *same* results every time? Consistency is hardest. And there is no mathetmtical forumal because its inherently reliant on the data and the results both. And it compunds over time. Some types of approaches that my be useful:
 
-A) Making an average check from total rules or policies we have defined. example - If I say 5 of  these 10 tickets are classified as P1 ticket because of security and AI also flags it as security, we can call it consistent.
+A) Category Agreement Rate: Making an average check from total rules or policies we have defined. example - If I say 5 of  these 10 tickets are classified as P1 ticket because of security and AI also flags it as security, we can call it consistent. Th sample code measures this as reason_consistency.
 
 B) An extension of A. Storing consistency results over time so they can become a knolwedge base for AI context injection. 
 
 C) LLM as a judge. 
+
+
 
 ## Code & Test
 
@@ -145,10 +157,12 @@ graph TD
 
 
 
-## Key Takeways
+## Key Takeaways
 
 1. Finding the metric that matters most is important. It different for different use case. 
 
-2. Store benchmarks. This the golden truth and key context for AI request.
+2. 50 datasets are generally a good starting point because they give enough rom to explore edge cases and drifts in behaviour (especially if we are doing any kind of semantic checks).
+
+3. Store benchmarks. This the golden truth and key context for AI request.
 
    

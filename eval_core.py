@@ -39,7 +39,7 @@ def evaluate_tickets(tickets):
             url,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer sk-KEYHERE",
+                "Authorization": "Bearer sk-KEYHERE",  # USE ENV VARS IN PRODUCTION. IM LAZY
             },
             json=json_data,
         )
@@ -55,7 +55,7 @@ def evaluate_tickets(tickets):
 
         if ticket["truth"] == "flag" and ticket["aidecision"] == "flag":
             tp += 1
-        elif ticket["truth"] == "flag" and ticket["ai"] == "ok":
+        elif ticket["truth"] == "flag" and ticket["aidecision"] == "ok":
             fn += 1
         elif ticket["truth"] == "ok" and ticket["aidecision"] == "flag":
             fp += 1
