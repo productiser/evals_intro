@@ -84,7 +84,7 @@ Accuracy takes both sides. FP and FN. The issue with taking both sides is that i
 
 F1 is interesting because it tries to penalise imbalanced recall and precision. F1 is also great because we have several parameters- model, prompt and F1 gives one number to make sense of it all before deciding.
 $$
-2 * (FP*FR)/(FP+FR)
+2 * (Precision*Recall)/(Precision+Recall)
 $$
 
 | Recall         | Precision     | F1   |
@@ -102,7 +102,7 @@ Decided this is going to be step 2 and depending on specific context so not expl
 
 ## Consistency
 
-But what about getting *same* results every time? Consistency is hardest. And there is no mathematical forumla because its inherently reliant on the data and the results both. And it compunds over time. Some types of approaches that my be useful:
+But what about getting *same* results every time? Consistency is hardest. And there is no mathematical formula because its inherently reliant on the data and the results both. And it compunds over time. Some types of approaches that my be useful:
 
 A) Category Agreement: Making an average check from total rules or policies we have defined. example - If I say 5 of  these 10 tickets are classified as P1 ticket because of security and AI also flags it as security, we can call it consistent. Th sample code measures this as reason_consistency.
 
@@ -112,7 +112,7 @@ C) LLM as a judge.
 
 ## Code & Test
 
-How I learnt all of this isnt by theory.I didnt search for evals for AI because frameworks dont tell the real what and how. I wrote some python code for the support ticket example to do evals harness from scratch. All code included. 
+How I learnt all of this isnt by theory.I didnt search for evals for AI because frameworks dont tell the real what and how. I wrote some python code for the support ticket example to do evals harness from scratch. All code free to use. 
 
 ## Benchmarks
 
@@ -132,11 +132,15 @@ Lets explore this with a simple agent where AI reviews a case for clauses and ne
 
 ## Pipeline
 
-## ![eval_pipeline](/Users/praveenataluri/dev/evals-May2026/kb/eval_pipeline.png)Key Takeaways
+https://mermaid.ai/d/a6cb5217-436e-4b04-8206-9c7e83199d84
+
+
+
+## Takeaways
 
 1. Finding the metric that matters most is important. It different for different use case. 
 
-2. 50 datasets are generally a good starting point because they give enough rom to explore edge cases and drifts in behaviour (especially if we are doing any kind of semantic checks).
+2. 50 examples are generally a good starting point because they give enough rom to explore edge cases and drifts in behaviour (especially if we are doing any kind of semantic checks).
 
 3. Store benchmarks. This the golden truth and key context for AI request.
 
