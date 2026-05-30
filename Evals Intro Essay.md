@@ -4,13 +4,13 @@ My day started with a question. "How can I get **consistent** results from AI". 
 
 Everyone is working on AI or AI agents these days. AI systems arent a direct function- there are lot of parameters- the model, the weights, the prompt quality, inputs etc. which honestly makes reliability questionable.
 
-Before we start getting inference involved, every statement needs a human labelled truth. Its using the domain knowledge, experience and wahtever other tools they have at their disposal. Without this, evals is as good as comparing AI with itself. Spideman meme. 
+Before we start getting inference involved, every statement needs a human labelled truth. Its using the domain knowledge, experience and whatever other tools they have at their disposal. Without this, evals is as good as comparing AI with itself. Spiderman meme. 
 
 First term:
 
 * Ground truth (GT) -> Its what a expert human has said the benchmark should be. 
 
-What comes next is what does AI say in relation to nto this GT. Thats what has amazingly confusing names. and since a ground truth can be Risk/OK (think any 2 binary on-off values), we have 4 combinations.
+What comes next is what does AI say in relation to not this GT. Thats what has amazingly confusing names. and since a ground truth can be Risk/OK (think any 2 binary on-off values), we have 4 combinations.
 
 | Ground Truth | AI Response | Base Metric                                                  | Example                                                      |
 | ------------ | ----------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -21,7 +21,7 @@ What comes next is what does AI say in relation to nto this GT. Thats what has a
 
 ## Mapping use cases and what to minimise on
 
-Real world is messy so not all use cases can follow same requirement for metric to optimise on. Obviously the intersting ones are going to be where there are deviations liek FP and FN. Lets see a few examples.
+Real world is messy so not all use cases can follow same requirement for metric to optimise on. Obviously the interesting ones are going to be where there are deviations like FP and FN. Lets see a few examples.
 
 | Use Case                          | GT         | Minimise On                 | Rationale                                                    |
 | --------------------------------- | ---------- | --------------------------- | ------------------------------------------------------------ |
@@ -38,7 +38,7 @@ Real world is messy so not all use cases can follow same requirement for metric 
 
 If this is too much, generally they fall under these themes.
 
-A) Safety critical? Minimse FN. Defend the bad ones.
+A) Safety critical? Minimise FN. Defend the bad ones.
 
 B)User Experience? Minimise FP. Protect the good ones.
 
@@ -48,7 +48,7 @@ C)Business tradeoff? depends on cost of review vs cost of missing.
 
 We might ask a few questions like how many bad ones did I not detect? how many good ones did I miss? 
 
-Thankfully for us, we have some simple metrics that help us answer this.  Interestingly, all metrics are jsut a comparision and ranking wrt to other base metrics.
+Thankfully for us, we have some simple metrics that help us answer this.  Interestingly, all metrics are just a comparision and ranking wrt to other base metrics.
 
 ### Recall
 
@@ -64,11 +64,11 @@ So if I dont have any FN, my recall is 100%. What we aspire for when we want to 
 
 ## Precision
 
-Precision is best defined as the noise in our space. If Im fishing for fish, I get tyres, bottles, shipwreck then my precison goes down. Expectedly then, precision is a measure of FP. 
+Precision is best defined as the noise in our space. If Im fishing for fish, I get tyres, bottles, shipwreck then my precision goes down. Expectedly then, precision is a measure of FP. 
 $$
 precision = TP/(TP+FP)
 $$
-My fishing expediation got me total of 10 items. 5 fishes, 1 tyre, 3 plastic bottles, 1 captain hook's crutch. 
+My fishing expedition got me total of 10 items. 5 fishes, 1 tyre, 3 plastic bottles, 1 captain hook's crutch. 
 $$
 precision = 5/(10) = 0.5 = 50%
 $$
@@ -87,7 +87,6 @@ $$
 2 * (FP*FR)/(FP+FR)
 $$
 
-
 | Recall         | Precision     | F1   |
 | -------------- | ------------- | ---- |
 | 100            | 100           | 100  |
@@ -103,61 +102,37 @@ Decided this is going to be step 2 and depending on specific context so not expl
 
 ## Consistency
 
-But what about getting *same* results every time? Consistency is hardest. And there is no mathetmtical forumal because its inherently reliant on the data and the results both. And it compunds over time. Some types of approaches that my be useful:
+But what about getting *same* results every time? Consistency is hardest. And there is no mathematical forumla because its inherently reliant on the data and the results both. And it compunds over time. Some types of approaches that my be useful:
 
-A) Category Agreement Rate: Making an average check from total rules or policies we have defined. example - If I say 5 of  these 10 tickets are classified as P1 ticket because of security and AI also flags it as security, we can call it consistent. Th sample code measures this as reason_consistency.
+A) Category Agreement: Making an average check from total rules or policies we have defined. example - If I say 5 of  these 10 tickets are classified as P1 ticket because of security and AI also flags it as security, we can call it consistent. Th sample code measures this as reason_consistency.
 
-B) An extension of A. Storing consistency results over time so they can become a knolwedge base for AI context injection. 
+B) An extension of A. Storing consistency results over time so they can become a knowledge base for AI context injection. 
 
 C) LLM as a judge. 
 
-
-
 ## Code & Test
 
-How I learnt all of this isnt y theory.I didnt search for evals for AI because frameworks dont tell the real what and how. I wrote some python code for the support ticket example to do evals harness from scratch. All code included here. 
+How I learnt all of this isnt by theory.I didnt search for evals for AI because frameworks dont tell the real what and how. I wrote some python code for the support ticket example to do evals harness from scratch. All code included. 
 
-## Process
+## Benchmarks
 
-```
-graph TD
-    %% Phase 1: Ground Truth & Initial Evals
-    subgraph P1 [Phase 1: Baseline & Evaluation Loop]
-        A[50 Human-Labeled Examples<br><b>Ground Truth</b>] --> B(Run AI Evaluations)
-        B --> C{Metrics Pass?}
-        C -- No --> D[Tweak Prompt / Model]
-        D --> B
-        C -- Yes --> E[Identify Best Prompt/Model]
-    end
+**Benchmark = use cases worth remembering. ** It's a **high-signal dataset**. We need one because over time we need to know if we doing better or worse from where we started and catch any degradation. What makes something high-signal:
 
-    %% Phase 2: Controlled Go-Live
-    subgraph P2 [Phase 2: Controlled Go-Live & HITL]
-        E --> F[Controlled Go-Live<br><b>Production</b>]
-        F --> G[AI Generates Response]
-        G --> H[Human-in-the-Loop Review]
-        H --> I[Assess Metrics vs. Ground Truth]
-    end
+- AI got it **wrong** → definitely add (failure to learn from)
+- AI got it **right but it was a hard/ambiguous case** → add (edge case coverage)
+- AI got it **right on an easy case** → don't bother (no new information)
 
-    %% Phase 3: Continuous Improvement
-    subgraph P3 [Phase 3: Continuous Improvement]
-        I --> J{Metrics Degraded /<br>Response Different?}
-        J -- Yes --> K[Push to Benchmark Dataset]
-        K --> L[(Benchmark Dataset)]
-        L --> M[RAG Context / Future Training]
-        M --> D
-        J -- No --> N[Maintain Production]
-    end
+Lets explore this with a simple agent where AI reviews a case for clauses and needs to flag them correctly.
 
-    %% Style Adjustments
-    style A fill:#d4edda,stroke:#28a745,stroke-width:2px
-    style E fill:#fff3cd,stroke:#ffc107,stroke-width:2px
-    style F fill:#cce5ff,stroke:#007bff,stroke-width:2px
-    style L fill:#f8d7da,stroke:#dc3545,stroke-width:2px
-```
+| Case                   | AI Says | Human Says | Add to Benchmark? | Why?              |
+| ---------------------- | ------- | ---------- | ----------------- | ----------------- |
+| Clear breaches         | Reject  | Reject     | No                | no signal         |
+| Ambiguous statement    | Accept  | Reject     | Yes               | FN case.          |
+| New Legislation clause | Reject  | Accept     | Yes               | latest knowledge. |
 
+## Pipeline
 
-
-## Key Takeaways
+## ![eval_pipeline](/Users/praveenataluri/dev/evals-May2026/kb/eval_pipeline.png)Key Takeaways
 
 1. Finding the metric that matters most is important. It different for different use case. 
 
