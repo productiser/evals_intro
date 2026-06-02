@@ -1,6 +1,12 @@
 from datetime import datetime
 import json
 import httpx
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Loads environment variables from a .env file if present
+
+api_key = os.getenv("OPENROUTER_API_KEY")
 
 
 # =====================================================================
@@ -18,9 +24,9 @@ def predict_single_ticket(ticket_title):
                 "content": f"Classify the following support decision as 'flag' or 'ok'. "
                 f"Assign a reason for each decision from security, financial impact, "
                 f"executive escalation, service outage, account access, and compliance. "
-                f"If reason is not listed, state a different reason. Do not include any "
+                f"If reason is not listed, state a different reason. Do not include any . Priority is P1-P4 with P1 being the most severe. Do not include any other."
                 f"other text or explanations in the response or fields. Return JSON only "
-                f"with 2 fields aireason and aidecision: {ticket_title}",
+                f"with 3 fields aireason, aipriority, and aidecision: {ticket_title}",
             }
         ],
         "response_format": {"type": "json_object"},
@@ -31,7 +37,7 @@ def predict_single_ticket(ticket_title):
             url,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "Bearer KEY HERE",  # Replace with your actual key safely
+                "Authorization": f"Bearer {api_key}",  # Replace with your actual key safely
             },
             json=json_data,
         )
@@ -45,6 +51,7 @@ def predict_single_ticket(ticket_title):
         return (
             data["aidecision"].strip().lower(),
             data["aireason"].strip().lower(),
+            data["aipriority"].strip().upper(),
         )
 
     except Exception as e:
@@ -138,11 +145,12 @@ if __name__ == "__main__":
 
         # Step 2: Runs the AI immediately on this single ticket
         print("   🤖 Running AI prediction...")
-        ai_decision, ai_reason = predict_single_ticket(user_title)
+        ai_decision, ai_reason, ai_priority = predict_single_ticket(user_title)
 
         print(f"\n   [AI Result]")
         print(f"   -> Decision: {ai_decision.upper()}")
         print(f"   -> Reason:   {ai_reason}")
+        print(f"   -> Priority: {ai_priority}")
         print("   -----------------------------------------------")
 
         # Step 3: Hand over to the user to evaluate / validate right away
@@ -161,6 +169,7 @@ if __name__ == "__main__":
                 "title": user_title,
                 "aidecision": ai_decision,
                 "aireason": ai_reason,
+                "ai_priority": ai_priority,
                 "truth": user_truth,
                 "reason": user_reason,
             }
@@ -174,7 +183,6 @@ if __name__ == "__main__":
         final_metrics = calculate_evaluation_metrics(session_tickets)
 
         # Print quick recap to console
-        print(f"   - Accuracy:  {final_metrics['accuracy']}")
         print(f"   - Recall:    {final_metrics['recall']}")
         print(f"   - F1-Score:  {final_metrics['f1_score']}")
 
